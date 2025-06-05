@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fraud Report Form</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #dbeafe, #fcdada);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      max-width: 600px;
+      width: 100%;
+    }
+    h2 {
+      text-align: center;
+      color: #dc2626;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      background-color: #dc2626;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #b91c1c;
+    }
+    .footer {
+      margin-top: 20px;
+      font-size: 14px;
+      color: gray;
+      text-align: center;
+    }
+    .footer a {
+      color: blue;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>🛡️ Report Online Fraud</h2>
+<form action="http://localhost:5000/api/report" method="POST" enctype="multipart/form-data">
+  <label><b>Name:</b></label>
+  <input type="text" placeholder="Your Full Name" required />
+  <label><b>Mail:</b></label>
+  <input type="email" placeholder="Your Email Address" required />
+  <label><b>Contact:</b></label>
+  <input type="tel" placeholder="Your contact number" pattern="[6-9]{1}[0-9]{9}" maxlength="10" placeholder="Enter 10-digit mobile number" required>
+
+  <select id="fraudType" required onchange="toggleOtherInput('fraudType', 'otherFraudInput')">
+    <option value="">Select Fraud Type</option>
+    <option value="upi">UPI Scam</option>
+    <option value="job">Fake Job Offer</option>
+    <option value="olx">OLX/Marketplace Scam</option>
+    <option value="crypto">Crypto Fraud</option>
+    <option value="other">Other</option>
+  </select>
+  <input id="otherFraudInput" type="text" placeholder="Please specify other fraud type" style="display:none;" />
+
+  <select id="paymentMethod" required onchange="toggleOtherInput('paymentMethod', 'otherPaymentInput')">
+    <option value="">Payment Method</option>
+    <option value="gpay">Google Pay</option>
+    <option value="phonepe">PhonePe</option>
+    <option value="paytm">Paytm</option>
+    <option value="bank">Bank Transfer</option>
+    <option value="other">Other</option>
+  </select>
+  <input id="otherPaymentInput" type="text" placeholder="Please specify other payment method" style="display:none;" />
+
+  <input type="tel" placeholder="Fraudster Contact Number" required />
+  <input type="email" placeholder="Fraudster Email Address" />
+  <input type="text" placeholder="Fraudster Bank Account Details" required />
+  <input type="text" placeholder="UTR Number (optional)" />
+
+  <textarea rows="4" placeholder="Describe what happened..." required></textarea>
+
+  <label><b>Upload Chat Screenshot(s):</b></label>
+  <input type="file" accept="image/*" multiple />
+
+  <label><b>Upload Payment Proof (Screenshot):</b></label>
+  <input type="file" accept="image/*" required />
+
+  <label><b>Upload Call Recording (Audio):</b></label>
+  <input type="file" accept="audio/*" multiple />
+  <div style="text-align: center;">
+    <button type="submit">Submit Report</button>
+  </div>
+  
+</form>
+
+
+    <div class="footer">
+      <strong>Legal Tip:</strong> We are a third-party platform assisting fraud victims.
+      We do <u>not store</u> your sensitive data permanently and only forward details to
+      <a href="https://cybercrime.gov.in/" target="_blank">cybercrime.gov.in</a>.
+    </div>
+  </div>
+
+  <script>
+    function toggleOtherInput(selectId, inputId) {
+      const select = document.getElementById(selectId);
+      const input = document.getElementById(inputId);
+      input.style.display = select.value === 'other' ? 'block' : 'none';
+    }
+  </script>
+  <script>
+  const form = document.querySelector('form');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+    const response = await fetch('http://localhost:5000/api/report', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (response.ok) {
+      alert('✅ Your report has been submitted successfully.');
+      form.reset();
+    } else {
+      alert('❌ Submission failed. Please try again.');
+    }
+  });
+</script>
+
+</body>
+</html>
