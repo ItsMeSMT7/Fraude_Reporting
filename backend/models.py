@@ -14,12 +14,10 @@ class FraudReport(db.Model):
     fraud_contact = db.Column(db.String(100))
     fraud_bank = db.Column(db.String(100))
     utr_number = db.Column(db.String(50))
-
     screenshot_path = db.Column(db.String(200))
     chat_proof_path = db.Column(db.String(200))
     payment_proof_path = db.Column(db.String(200))
     call_recording_path = db.Column(db.String(200))
-
     submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def to_dict(self):
