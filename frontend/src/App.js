@@ -1,9 +1,13 @@
-import FraudReportForm from "./pages/FraudReportForm";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import AdminDashboard from "./pages/AdminDashboard"; // or wherever saved
 
 function App() {
   return (
-    <div>
-      <FraudReportForm />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/admin" element={<AdminDashboard />} />
+        {/* other routes */}
+      </Routes>
+    </Router>
   );
 }

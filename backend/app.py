@@ -4,20 +4,21 @@ from flask_cors import CORS
 from flask_mail import Mail, Message
 from werkzeug.utils import secure_filename
 from flask_sqlalchemy import SQLAlchemy
-from models import db, FraudReport  # ✅ Make sure models.py uses the same db
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # -------------------- App Initialization --------------------
-
 app = Flask(__name__)
 CORS(app)
 
 # -------------------- Configuration --------------------
-
 # Database (PostgreSQL)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Admin%401234@localhost:5432/fraud_db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://postgres:password@localhost:5432/fraud_db')  # Replace with your own environment variable
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# 📌 2. Initialize db after app config
+# 📌 Initialize db after app config
 db = SQLAlchemy(app)
 
 # File Uploads
@@ -29,21 +30,18 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'fraudreportapi@gmail.com'
-app.config['MAIL_PASSWORD'] = 'atvg wtta hvcs gxih'  # 🔐 App Password only
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')  # Get from .env
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')  # Get from .env
 
 # -------------------- Extensions --------------------
-
-db.init_app(app)
 mail = Mail(app)
 
 # -------------------- Routes --------------------
-
 @app.route('/api/report', methods=['POST'])
 def submit_report():
     data = request.form.to_dict()
 
-    # File upload logic...
+    # File upload logic
     uploaded_files = {
         "screenshot": request.files.get('screenshot'),
         "chat_proof": request.files.get('chat_proof'),
@@ -60,7 +58,7 @@ def submit_report():
         else:
             saved_files[field] = None
 
-    # ✅ This is where your line goes:
+    # Create a report instance
     report = FraudReport(
         victim_name=data.get('victim_name'),
         email=data.get('email'),
@@ -81,8 +79,7 @@ def submit_report():
     db.session.add(report)
     db.session.commit()
 
-
-    # Email Confirmation
+    # Send email confirmation
     if data.get('email'):
         try:
             msg = Message(
@@ -97,22 +94,19 @@ def submit_report():
 
     return jsonify({"message": "Report submitted successfully"}), 200
 
-# Serve uploaded files
+
 @app.route('/uploads/<filename>')
 def serve_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
-
-#----------------retrieves and displays all reports----------------
+# Retrieve all reports
 @app.route('/api/reports', methods=['GET'])
 def get_all_reports():
     reports = FraudReport.query.all()
     return jsonify([r.to_dict() for r in reports])
 
-
 # -------------------- Main --------------------
-
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()
-    app.run(debug=True)
+        db.create_all()  # Create tables in DB if they don't exist
+    app.run(debug=True)  # Run Flask in debug mode
