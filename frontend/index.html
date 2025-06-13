@@ -5,146 +5,934 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Fraud Report Form</title>
   <style>
-    body {
+    * {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #dbeafe, #fcdada);
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* Light theme variables */
+      --bg-primary: #5865f2;
+      --bg-secondary: #7289da;
+      --surface-primary: rgba(255, 255, 255, 0.95);
+      --surface-secondary: rgba(255, 255, 255, 0.1);
+      --text-primary: #333;
+      --text-secondary: #666;
+      --text-accent: #5865f2;
+      --border-color: #e1e5e9;
+      --input-bg: #fff;
+      --suggestion-bg: #f8f9fa;
+      --file-bg: #f8f9fa;
+    }
+
+    [data-theme="dark"] {
+      /* Dark theme variables */
+      --bg-primary: #2c2f33;
+      --bg-secondary: #23272a;
+      --surface-primary: rgba(54, 57, 63, 0.95);
+      --surface-secondary: rgba(255, 255, 255, 0.05);
+      --text-primary: #dcddde;
+      --text-secondary: #b9bbbe;
+      --text-accent: #7289da;
+      --border-color: #40444b;
+      --input-bg: #40444b;
+      --suggestion-bg: #36393f;
+      --file-bg: #36393f;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
       min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+      transition: all 0.3s ease;
     }
-    .card {
-      background: white;
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-      max-width: 600px;
+
+    /* Discord-style animated background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 80%, var(--surface-secondary) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, var(--surface-secondary) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, var(--surface-secondary) 0%, transparent 50%);
+      animation: discordFloat 8s ease-in-out infinite;
+      pointer-events: none;
+      z-index: -1;
     }
-    h2 {
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 2px,
+        var(--surface-secondary) 2px,
+        var(--surface-secondary) 4px
+      );
+      opacity: 0.03;
+      animation: discordMove 20s linear infinite;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    @keyframes discordFloat {
+      0%, 100% { 
+        transform: translateY(0px) rotate(0deg); 
+        opacity: 0.6;
+      }
+      33% { 
+        transform: translateY(-20px) rotate(1deg); 
+        opacity: 0.8;
+      }
+      66% { 
+        transform: translateY(10px) rotate(-1deg); 
+        opacity: 0.4;
+      }
+    }
+
+    @keyframes discordMove {
+      0% { transform: translateX(-100px); }
+      100% { transform: translateX(100px); }
+    }
+
+    /* Theme toggle */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      background: var(--surface-primary);
+      border: 2px solid var(--border-color);
+      border-radius: 50px;
+      padding: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .theme-toggle:hover {
+      transform: scale(1.1);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .theme-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: all 0.3s ease;
+      background: linear-gradient(135deg, var(--text-accent), var(--bg-secondary));
+      color: white;
+    }
+
+    .container {
+      background: var(--surface-primary);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 40px;
+      max-width: 700px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      position: relative;
+      animation: slideUp 0.8s ease-out;
+      transition: all 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .header {
       text-align: center;
-      color: #dc2626;
+      margin-bottom: 30px;
     }
+
+    .header h1 {
+      background: linear-gradient(135deg, var(--text-accent), var(--bg-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .form-label {
+      display: block;
+      color: var(--text-primary);
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
     input, select, textarea {
       width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+      padding: 16px 20px;
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
       font-size: 16px;
+      transition: all 0.3s ease;
+      background: var(--input-bg);
+      color: var(--text-primary);
+      outline: none;
     }
-    button {
-      background-color: #dc2626;
-      color: white;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      margin-top: 20px;
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--text-accent);
+      box-shadow: 0 0 0 4px rgba(88, 101, 242, 0.1);
+      transform: translateY(-2px);
+    }
+
+    input:hover, select:hover, textarea:hover {
+      border-color: var(--text-accent);
+    }
+
+    /* Enhanced dropdown styling */
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+      background-position: right 12px center;
+      background-repeat: no-repeat;
+      background-size: 16px;
+      padding-right: 40px;
+    }
+
+    select:focus {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%235865f2' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    }
+
+    /* Dark theme select arrow */
+    [data-theme="dark"] select {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23b9bbbe' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    }
+
+    [data-theme="dark"] select:focus {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%237289da' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    }
+
+    /* Autocomplete suggestions */
+    .suggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--input-bg);
+      border: 2px solid var(--border-color);
+      border-top: none;
+      border-radius: 0 0 12px 12px;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 1000;
+      display: none;
+    }
+
+    .suggestion-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-primary);
+    }
+
+    .suggestion-item:hover {
+      background-color: var(--suggestion-bg);
+    }
+
+    .suggestion-item:last-child {
+      border-bottom: none;
+    }
+
+    /* File upload styling */
+    .file-upload {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+    }
+
+    .file-input {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
       cursor: pointer;
     }
-    button:hover {
-      background-color: #b91c1c;
-    }
-    .footer {
-      margin-top: 20px;
-      font-size: 14px;
-      color: gray;
+
+    .file-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      border: 2px dashed var(--text-accent);
+      border-radius: 12px;
+      background: var(--surface-secondary);
+      cursor: pointer;
+      transition: all 0.3s ease;
       text-align: center;
     }
+
+    .file-label:hover {
+      border-color: var(--bg-secondary);
+      background: var(--surface-primary);
+      transform: translateY(-2px);
+    }
+
+    .file-icon {
+      font-size: 2rem;
+      margin-right: 10px;
+    }
+
+    .file-text {
+      font-weight: 600;
+      color: var(--text-accent);
+    }
+
+    .file-hint {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: 5px;
+    }
+
+    .selected-files {
+      margin-top: 12px;
+      display: none;
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: var(--file-bg);
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    .file-name {
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      flex: 1;
+    }
+
+    .file-remove {
+      background: #ff4757;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .submit-btn {
+      background: linear-gradient(135deg, var(--text-accent), var(--bg-secondary));
+      color: white;
+      padding: 18px 40px;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.3s ease;
+      margin-top: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 35px rgba(88, 101, 242, 0.4);
+    }
+
+    .submit-btn:active {
+      transform: translateY(-1px);
+    }
+
+    /* Super cool submit animation */
+    .submit-btn.submitting {
+      animation: submitPulse 0.6s ease-in-out;
+      pointer-events: none;
+    }
+
+    .submit-btn.success {
+      background: linear-gradient(135deg, #2ed573, #1e90ff);
+      animation: successRipple 0.8s ease-out;
+    }
+
+    .submit-btn.error {
+      background: linear-gradient(135deg, #ff4757, #ff3838);
+      animation: errorShake 0.6s ease-in-out;
+    }
+
+    @keyframes submitPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(88, 101, 242, 0.6); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes successRipple {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(46, 213, 115, 0.7); }
+      70% { transform: scale(1.02); box-shadow: 0 0 0 30px rgba(46, 213, 115, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(46, 213, 115, 0); }
+    }
+
+    @keyframes errorShake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+
+    .submit-particles {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 1px;
+      height: 1px;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: white;
+      border-radius: 50%;
+      animation: particle-explosion 0.8s ease-out forwards;
+    }
+
+    @keyframes particle-explosion {
+      0% {
+        opacity: 1;
+        transform: scale(0);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(1) translate(var(--x), var(--y));
+      }
+    }
+
+    .footer {
+      margin-top: 30px;
+      padding: 20px;
+      background: var(--surface-secondary);
+      border-radius: 12px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      text-align: center;
+      line-height: 1.6;
+    }
+
     .footer a {
-      color: blue;
+      color: var(--text-accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .footer a:hover {
       text-decoration: underline;
+    }
+
+    /* Loading animation */
+    .loading {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .container {
+        margin: 10px;
+        padding: 24px;
+      }
+      
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      .theme-toggle {
+        top: 10px;
+        right: 10px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h2>🛡️ Report Online Fraud</h2>
-<form action="http://localhost:5000/api/report" method="POST" enctype="multipart/form-data">
-  <label><b>Name:</b></label>
-  <input type="text" placeholder="Your Full Name" required />
-  <label><b>Mail:</b></label>
-  <input type="email" placeholder="Your Email Address" required />
-  <label><b>Contact:</b></label>
-  <input type="tel" placeholder="Your contact number" pattern="[6-9]{1}[0-9]{9}" maxlength="10" placeholder="Enter 10-digit mobile number" required>
-
-  <select id="fraudType" required onchange="toggleOtherInput('fraudType', 'otherFraudInput')">
-    <option value="">Select Fraud Type</option>
-    <option value="upi">UPI Scam</option>
-    <option value="job">Fake Job Offer</option>
-    <option value="olx">OLX/Marketplace Scam</option>
-    <option value="crypto">Crypto Fraud</option>
-    <option value="other">Other</option>
-  </select>
-  <input id="otherFraudInput" type="text" placeholder="Please specify other fraud type" style="display:none;" />
-
-  <select id="paymentMethod" required onchange="toggleOtherInput('paymentMethod', 'otherPaymentInput')">
-    <option value="">Payment Method</option>
-    <option value="gpay">Google Pay</option>
-    <option value="phonepe">PhonePe</option>
-    <option value="paytm">Paytm</option>
-    <option value="bank">Bank Transfer</option>
-    <option value="other">Other</option>
-  </select>
-  <input id="otherPaymentInput" type="text" placeholder="Please specify other payment method" style="display:none;" />
-
-  <input type="tel" placeholder="Fraudster Contact Number" required />
-  <input type="email" placeholder="Fraudster Email Address" />
-  <input type="text" placeholder="Fraudster Bank Account Details" required />
-  <input type="text" placeholder="UTR Number (optional)" />
-
-  <textarea rows="4" placeholder="Describe what happened..." required></textarea>
-
-  <label><b>Upload Chat Screenshot(s):</b></label>
-  <input type="file" accept="image/*" multiple />
-
-  <label><b>Upload Payment Proof (Screenshot):</b></label>
-  <input type="file" accept="image/*" required />
-
-  <label><b>Upload Call Recording (Audio):</b></label>
-  <input type="file" accept="audio/*" multiple />
-  <div style="text-align: center;">
-    <button type="submit">Submit Report</button>
+  <!-- //Now its ready to deploy -->
+  <div class="theme-toggle" onclick="toggleTheme()">
+    <div class="theme-icon" id="themeIcon">🌙</div>
   </div>
-  
-</form>
 
+  <div class="container">
+    <div class="header">
+      <h1>🛡️ Fraud Report</h1>
+      <p>Help us protect others by reporting online fraud</p>
+    </div>
+
+    <form id="fraudForm" action="http://localhost:5000/api/report" method="POST" enctype="multipart/form-data">
+      
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <div class="input-wrapper">
+          <input type="text" name="victim_name" placeholder="Enter your full name" required 
+                 data-suggestions='["John Doe", "Jane Smith", "Alex Johnson"]' />
+          <div class="suggestions"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <div class="input-wrapper">
+          <input type="email" name="email" placeholder="your.email@example.com" required 
+                 data-suggestions='["@gmail.com", "@yahoo.com", "@outlook.com", "@hotmail.com"]' />
+          <div class="suggestions"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Contact Number</label>
+        <input type="tel" name="contact" placeholder="Enter 10-digit mobile number" 
+               pattern="[6-9]{1}[0-9]{9}" maxlength="10" required />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Fraud Type</label>
+        <select name="fraud_type" id="fraudType" required onchange="toggleOtherInput('fraudType', 'otherFraudInput')">
+          <option value="">Select fraud type</option>
+          <option value="upi">UPI Scam</option>
+          <option value="job">Fake Job Offer</option>
+          <option value="olx">OLX/Marketplace Scam</option>
+          <option value="crypto">Cryptocurrency Fraud</option>
+          <option value="romance">Romance Scam</option>
+          <option value="investment">Investment Fraud</option>
+          <option value="lottery">Lottery Scam</option>
+          <option value="other">Other</option>
+        </select>
+        <input id="otherFraudInput" type="text" name="other_fraud_type" 
+               placeholder="Please specify other fraud type" style="display:none; margin-top: 10px;" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Payment Method Used</label>
+        <select name="payment_method" id="paymentMethod" required onchange="toggleOtherInput('paymentMethod', 'otherPaymentInput')">
+          <option value="">Select payment method</option>
+          <option value="gpay">Google Pay</option>
+          <option value="phonepe">PhonePe</option>
+          <option value="paytm">Paytm</option>
+          <option value="bank">Bank Transfer/NEFT</option>
+          <option value="upi">UPI</option>
+          <option value="card">Credit/Debit Card</option>
+          <option value="other">Other</option>
+        </select>
+        <input id="otherPaymentInput" type="text" name="other_payment_method" 
+               placeholder="Please specify other payment method" style="display:none; margin-top: 10px;" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Fraudster Contact Number</label>
+        <div class="input-wrapper">
+          <input type="tel" name="fraud_phone" placeholder="Fraudster's phone number" required 
+                 data-suggestions='["+91", "Unknown", "Multiple numbers"]' />
+          <div class="suggestions"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Fraudster Email/Contact</label>
+        <div class="input-wrapper">
+          <input type="text" name="fraud_contact" placeholder="Fraudster's email or other contact" 
+                 data-suggestions='["Unknown", "WhatsApp", "Telegram", "Instagram", "Facebook"]' />
+          <div class="suggestions"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Fraudster Bank Details</label>
+        <div class="input-wrapper">
+          <input type="text" name="fraud_bank" placeholder="Bank account details (if known)" required 
+                 data-suggestions='["State Bank of India", "HDFC Bank", "ICICI Bank", "Axis Bank", "Unknown"]' />
+          <div class="suggestions"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">UTR Number (Optional)</label>
+        <input type="text" name="utr_number" placeholder="Unique Transaction Reference number" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Describe What Happened</label>
+        <textarea name="fraud_description" rows="4" placeholder="Please provide detailed description of the fraud incident..." required></textarea>
+      </div>
+
+      <!-- Multiple Chat Proof Upload -->
+      <div class="form-group">
+        <label class="form-label">Upload Chat Proof (Multiple allowed)</label>
+        <div class="file-upload">
+          <input type="file" name="chat_proof" class="file-input" accept="image/*" multiple id="chat_proof" />
+          <label for="chat_proof" class="file-label">
+            <span class="file-icon">💬</span>
+            <div>
+              <div class="file-text">Click to upload chat proofs</div>
+              <div class="file-hint">Screenshots of conversations</div>
+            </div>
+          </label>
+        </div>
+        <div class="selected-files" id="chat_proof-files"></div>
+      </div>
+
+      <!-- Payment Proof Upload -->
+      <div class="form-group">
+        <label class="form-label">Upload Payment Proof (Multiple allowed)</label>
+        <div class="file-upload">
+          <input type="file" name="payment_proof" class="file-input" accept="image/*" multiple id="payment_proof" required />
+          <label for="payment_proof" class="file-label">
+            <span class="file-icon">💳</span>
+            <div>
+              <div class="file-text">Click to upload payment proof</div>
+              <div class="file-hint">Transaction screenshots required</div>
+            </div>
+          </label>
+        </div>
+        <div class="selected-files" id="payment_proof-files"></div>
+      </div>
+
+      <!-- Call Recording Upload -->
+      <div class="form-group">
+        <label class="form-label">Upload Call Recording (Multiple allowed)</label>
+        <div class="file-upload">
+          <input type="file" name="call_recording" class="file-input" accept="audio/*" multiple id="call_recording" />
+          <label for="call_recording" class="file-label">
+            <span class="file-icon">🎵</span>
+            <div>
+              <div class="file-text">Click to upload call recordings</div>
+              <div class="file-hint">MP3, WAV, M4A up to 50MB each</div>
+            </div>
+          </label>
+        </div>
+        <div class="selected-files" id="call_recording-files"></div>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">
+        <span class="btn-text">Submit Fraud Report</span>
+        <div class="loading">
+          <div class="spinner"></div>
+        </div>
+        <div class="submit-particles"></div>
+      </button>
+    </form>
 
     <div class="footer">
-      <strong>Legal Tip:</strong> We are a third-party platform assisting fraud victims.
-      We do <u>not store</u> your sensitive data permanently and only forward details to
-      <a href="https://cybercrime.gov.in/" target="_blank">cybercrime.gov.in</a>.
+      <strong>🔒 Privacy Notice:</strong> We are a third-party platform assisting fraud victims. 
+      We do <u>not store</u> your sensitive data permanently and only forward details to 
+      <a href="https://cybercrime.gov.in/" target="_blank">cybercrime.gov.in</a>. 
+      Your information is handled with utmost care and security.
     </div>
   </div>
 
   <script>
+    // Theme toggle functionality
+    function toggleTheme() {
+      const body = document.body;
+      const themeIcon = document.getElementById('themeIcon');
+      const currentTheme = body.getAttribute('data-theme');
+      
+      if (currentTheme === 'dark') {
+        body.removeAttribute('data-theme');
+        themeIcon.textContent = '🌙';
+        localStorage.setItem('theme', 'light');
+      } else {
+        body.setAttribute('data-theme', 'dark');
+        themeIcon.textContent = '☀️';
+        localStorage.setItem('theme', 'dark');
+      }
+    }
+
+    // Load saved theme
+    function loadTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      const body = document.body;
+      const themeIcon = document.getElementById('themeIcon');
+      
+      if (savedTheme === 'dark') {
+        body.setAttribute('data-theme', 'dark');
+        themeIcon.textContent = '☀️';
+      }
+    }
+
+    // Autocomplete functionality
+    function setupAutocomplete() {
+      const inputs = document.querySelectorAll('input[data-suggestions]');
+      
+      inputs.forEach(input => {
+        const suggestions = JSON.parse(input.getAttribute('data-suggestions'));
+        const suggestionsDiv = input.nextElementSibling;
+        
+        input.addEventListener('input', function() {
+          const value = this.value.toLowerCase();
+          suggestionsDiv.innerHTML = '';
+          
+          if (value.length > 0) {
+            const filtered = suggestions.filter(s => 
+              s.toLowerCase().includes(value) || 
+              (input.type === 'email' && value.includes('@') && s.startsWith('@'))
+            );
+            
+            if (filtered.length > 0) {
+              suggestionsDiv.style.display = 'block';
+              filtered.forEach(suggestion => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.textContent = input.type === 'email' && suggestion.startsWith('@') 
+                  ? value.split('@')[0] + suggestion 
+                  : suggestion;
+                div.addEventListener('click', () => {
+                  input.value = div.textContent;
+                  suggestionsDiv.style.display = 'none';
+                });
+                suggestionsDiv.appendChild(div);
+              });
+            } else {
+              suggestionsDiv.style.display = 'none';
+            }
+          } else {
+            suggestionsDiv.style.display = 'none';
+          }
+        });
+        
+        input.addEventListener('blur', () => {
+          setTimeout(() => suggestionsDiv.style.display = 'none', 150);
+        });
+      });
+    }
+
+    // File upload functionality
+    function setupFileUploads() {
+      const fileInputs = document.querySelectorAll('.file-input');
+      
+      fileInputs.forEach(input => {
+        const filesContainer = document.getElementById(input.id + '-files');
+        
+        input.addEventListener('change', function() {
+          displaySelectedFiles(this, filesContainer);
+        });
+      });
+    }
+
+    function displaySelectedFiles(input, container) {
+      const files = Array.from(input.files);
+      container.innerHTML = '';
+      
+      if (files.length > 0) {
+        container.style.display = 'block';
+        
+        files.forEach((file, index) => {
+          const fileItem = document.createElement('div');
+          fileItem.className = 'file-item';
+          fileItem.innerHTML = `
+            <span class="file-name">${file.name} (${formatFileSize(file.size)})</span>
+            <button type="button" class="file-remove" onclick="removeFile('${input.id}', ${index})">×</button>
+          `;
+          container.appendChild(fileItem);
+        });
+      } else {
+        container.style.display = 'none';
+      }
+    }
+
+    function removeFile(inputId, index) {
+      const input = document.getElementById(inputId);
+      const dt = new DataTransfer();
+      const files = Array.from(input.files);
+      
+      files.forEach((file, i) => {
+        if (i !== index) dt.items.add(file);
+      });
+      
+      input.files = dt.files;
+      displaySelectedFiles(input, document.getElementById(inputId + '-files'));
+    }
+
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Toggle other input visibility
     function toggleOtherInput(selectId, inputId) {
       const select = document.getElementById(selectId);
       const input = document.getElementById(inputId);
       input.style.display = select.value === 'other' ? 'block' : 'none';
+      if (select.value !== 'other') input.value = '';
     }
-  </script>
-  <script>
-  const form = document.querySelector('form');
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
 
-    const formData = new FormData(form);
-    const response = await fetch('http://localhost:5000/api/report', {
-      method: 'POST',
-      body: formData,
+    // Create particle explosion effect
+    function createParticleExplosion(button) {
+      const particles = button.querySelector('.submit-particles');
+      particles.innerHTML = '';
+      
+      for (let i = 0; i < 12; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        const angle = (i * 30) * Math.PI / 180;
+        const distance = 50 + Math.random() * 30;
+        const x = Math.cos(angle) * distance;
+        const y = Math.sin(angle) * distance;
+        
+        particle.style.setProperty('--x', x + 'px');
+        particle.style.setProperty('--y', y + 'px');
+        particle.style.animationDelay = Math.random() * 0.2 + 's';
+        
+        particles.appendChild(particle);
+      }
+    }
+
+    // Form submission with enhanced animations
+    document.getElementById('fraudForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('submitBtn');
+      const btnText = submitBtn.querySelector('.btn-text');
+      const loading = submitBtn.querySelector('.loading');
+      
+      // Add submitting class for pulse animation
+      submitBtn.classList.add('submitting');
+      
+      // Create particle explosion
+      createParticleExplosion(submitBtn);
+      
+      // Show loading state after pulse animation
+      setTimeout(() => {
+        btnText.style.opacity = '0';
+        loading.style.display = 'block';
+        submitBtn.disabled = true;
+        submitBtn.classList.remove('submitting');
+      }, 600);
+      
+      try {
+        const formData = new FormData(this);
+        
+        const response = await fetch('http://localhost:5000/api/report', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        if (response.ok) {
+          // Success animation
+          submitBtn.classList.add('success');
+          btnText.textContent = '✅ Report Submitted Successfully!';
+          createParticleExplosion(submitBtn);
+          
+          setTimeout(() => {
+            alert('✅ Your fraud report has been submitted successfully. You will receive a confirmation email shortly.');
+            this.reset();
+            
+            // Reset file displays
+            document.querySelectorAll('.selected-files').forEach(container => {
+              container.style.display = 'none';
+              container.innerHTML = '';
+            });
+            
+            // Reset button
+            submitBtn.classList.remove('success');
+            submitBtn.style.background = '';
+            btnText.textContent = 'Submit Fraud Report';
+          }, 2000);
+        } else {
+          throw new Error('Submission failed');
+        }
+      } catch (error) {
+        // Error animation
+        submitBtn.classList.add('error');
+        btnText.textContent = '❌ Submission Failed';
+        
+        setTimeout(() => {
+          alert('❌ Submission failed. Please check your internet connection and try again.');
+          submitBtn.classList.remove('error');
+          submitBtn.style.background = '';
+          btnText.textContent = 'Submit Fraud Report';
+        }, 2000);
+      } finally {
+        // Reset loading state
+        setTimeout(() => {
+          btnText.style.opacity = '1';
+          loading.style.display = 'none';
+          submitBtn.disabled = false;
+        }, 1000);
+      }
     });
-
-    if (response.ok) {
-      alert('✅ Your report has been submitted successfully.');
-      form.reset();
-    } else {
-      alert('❌ Submission failed. Please try again.');
-    }
-  });
-</script>
+    //Initialization
+    // Initialize everything when page loads
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      loadTheme();
+      setupAutocomplete();
+      setupFileUploads();
+    });
+  </script>
 
 </body>
 </html>
