@@ -94,5 +94,48 @@ DATABASE_URL=mongodb://localhost:27017/fraud_report_api
 
 # Start the server
 python app.py
+```
+  
+## 🌐 Frontend (React)
 
+```bash
+# Navigate to the frontend folder
+cd ../frontend
 
+# Install dependencies
+npm install
+
+# Start the React development server
+npm start
+```
+## ☁️ Deployment
+- **Backend:** Host via Heroku, AWS, DigitalOcean
+
+- **Frontend:** Deploy on Netlify, Vercel, or GitHub Pages
+
+- **Use environment variables on the cloud to protect credentials and database strings.**
+
+## 🤝 Contributing
+## Contributions are welcome! Feel free to:
+
+- **Submit issues**
+
+- **Suggest features**
+
+- **Create pull requests**
+
+  ## Next features might include:
+
+- **SMS alerts via Twilio**
+
+- **AI-based fraud detection patterns**
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 📬 Contact
+
+For suggestions or issues, contact: asalkarsumit@gmail.com
+
+GitHub: ItsMeSMT7
